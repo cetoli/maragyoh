@@ -31,7 +31,7 @@ Connector
 try:
     from browser import window
 except ImportError:
-    from .browser import window
+    from maragyoh.views.browser import document, html, window, NODOM
 
 
 class Connect:

@@ -23,12 +23,15 @@
 
 """
 try:
-    from browser import document, html, window, NODOM
+    from browser import document, html, window
+    from connector import Connect
+    NODOM = html.DIV()
 except ImportError:
     from maragyoh.views.browser import document, html, window, NODOM
+    from maragyoh.views.connector import Connect
+
 
 from random import randint
-from maragyoh.views.connector import Connect
 
 SIZE = (50, 50)
 GRAY = (50, 50, 50)
@@ -51,17 +54,19 @@ class Item:
     item = {}
     prefix = "S_N_O_D_E_%03x" % randint(0x111, 0xfff) + "-%02d"
 
-    def __init__(self, node_id, rgb, size=SIZE, parent=NODOM):
+    def __init__(self, node_id, rgb, size=SIZE, parent=NODOM, text="-enter text-"):
         self.container = []
         self.capacity = self.item_count = self.rows = self.cols = 1
-        self.parent, self.node_id, self.rgb, self.size = self._init(node_id, rgb, size, parent)
+        self.base = self.content = NODOM
+        self.parent, self.node_id, self.rgb, self.size, self.text = self.init_(node_id, rgb, size, parent, text)
         self.parent = parent
 
-    def _init(self, node_id, rgb, size, parent):
+    def init_(self, node_id, rgb, size, parent, text):
         """
-        >>> print(item._init(2, (0, 0, 0), (15, 15), NODOM)[1:])
+        >>> print(item.init_(2, (0, 0, 0), (15, 15), NODOM)[1:])
         (2, (0, 0, 0), (15, 15))
 
+        :param text:
         :param node_id: Id for remote connection
         :param rgb: Color for the item
         :param size: Size for the item
@@ -73,10 +78,18 @@ class Item:
         self.base = base = html.DIV(style={
             "background-color": "rgb(%d, %d, %d)" % rgb, "padding": "4px", "margin": "4px",
             "height": "%dpx" % height, "width": "%dpx" % width, "float": "left"})
-        base.onclick = self.add_item
+        self.content = content = html.SPAN(text)
+        adder = html.SPAN("➕", style={"position": "relative", "float": "left", "left": "-4px", "top": "-4px"})
+        fixer = html.SPAN("❌", style={"position": "relative", "float": "right", "top": "-4px"})
+        self.base <= adder
+        self.base <= content
+        self.base <= fixer
+        fixer.onclick = self.fix_item
+        adder.onclick = self.add_item
+        content.onclick = self.edit_item
         # parent = Item.item[tuple(node_id[:-1])]
         parent <= self
-        return parent, node_id, rgb, size
+        return parent, node_id, rgb, size, text
 
     def create(self, rgb=None, node_id=None, size=None):
         """Create an Item instance.
@@ -119,6 +132,15 @@ class Item:
     def __le__(self, square):
         self.container.append(square)
         self.base <= square.base
+
+    def fix_item(self, ev=None):
+        ev.stopPropagation()
+        ev.target.contentEditable = False
+
+    def edit_item(self, ev=None):
+        ev.stopPropagation()
+        ev.target.contentEditable = True
+        # self.create().send()
 
     def add_item(self, ev=None):
         ev.stopPropagation()
