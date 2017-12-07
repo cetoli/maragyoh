@@ -83,3 +83,4 @@ document = browser.document = Browser()
 html = browser.html = Browser()
 window = browser.window = Browser()
 DIV = browser.DIV = browser.window.addEventListener = window.addEventListener = window.Peer.new = window.Peer.on = Browser().nodoings
+NODOM = Browser()

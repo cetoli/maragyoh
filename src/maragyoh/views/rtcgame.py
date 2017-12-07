@@ -23,12 +23,12 @@
 
 """
 try:
-    from browser import document, html, window
+    from browser import document, html, window, NODOM
 except ImportError:
-    from .browser import document, html, window
+    from maragyoh.views.browser import document, html, window, NODOM
 
 from random import randint
-from .connector import Connect
+from maragyoh.views.connector import Connect
 
 SIZE = (50, 50)
 GRAY = (50, 50, 50)
@@ -51,14 +51,24 @@ class Item:
     item = {}
     prefix = "S_N_O_D_E_%03x" % randint(0x111, 0xfff) + "-%02d"
 
-    def __init__(self, node_id, rgb, size=SIZE, parent=None):
+    def __init__(self, node_id, rgb, size=SIZE, parent=NODOM):
         self.container = []
         self.capacity = self.item_count = self.rows = self.cols = 1
         self.parent, self.node_id, self.rgb, self.size = self._init(node_id, rgb, size, parent)
         self.parent = parent
 
     def _init(self, node_id, rgb, size, parent):
-        print("XXXXXXX>>>> _init", ">%s<" % [node_id, rgb, size])
+        """
+        >>> print(item._init(2, (0, 0, 0), (15, 15), NODOM)[1:])
+        (2, (0, 0, 0), (15, 15))
+
+        :param node_id: Id for remote connection
+        :param rgb: Color for the item
+        :param size: Size for the item
+        :param parent: the node from wich this stems
+        :return: parent, node_id, rgb, size
+        """
+        # print("XXXXXXX>>>> _init", ">%s<" % [node_id, rgb, size])
         height, width = size
         self.base = base = html.DIV(style={
             "background-color": "rgb(%d, %d, %d)" % rgb, "padding": "4px", "margin": "4px",
@@ -169,3 +179,14 @@ class Base(Item):
 
 def main(last, nodeid):
     Base(last, nodeid)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod(globs=dict(
+        item=Item(12, GRAY),
+        NODOM=NODOM
+    ))
+
+    doctest.testmod(globs=dict(item=Item(12, GRAY), NODOM=NODOM))
