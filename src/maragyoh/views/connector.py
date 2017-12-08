@@ -32,6 +32,7 @@ try:
     from browser import window
 except ImportError:
     from maragyoh.views.browser import document, html, window, NODOM
+from . import log
 
 
 class Connect:
@@ -48,7 +49,7 @@ class Connect:
         self.conn = []
         self.remote_action = remote_action
         window.addEventListener("beforeunload", self.leave_connection)
-        print("XXXXXXX>>>> __init__(self, last, nodeid)", last, self.nid % last)
+        log.debug("XXXXXXX>>>> __init__(self, last=  %s, nodeid=  %s)", last, self.nid % last)
         self.init_peer(last)
 
     def send(self, data):
@@ -66,7 +67,7 @@ class Connect:
         self.peer = peer = window.Peer.new(self.nid % last, {'key': '49rhnah5bore8kt9', 'debug': 0})
 
         def do_connect(node_id):
-            print("XXXXXXX>>>> init_peer.channel.do_connect", node_id)
+            log.debug("XXXXXXX>>>> init_peer.channel.do_connect=  %s", node_id)
             conn = peer.connect(node_id)
             conn.on('data', self.remote_action)
             return conn
@@ -74,16 +75,16 @@ class Connect:
         self.conn = [do_connect(self.nid % nid) for nid in range(1, last) if nid != self.this]
 
     def get_connection(self, conn):
-        print("XXXXXXX>>>> get_connection(self, a_node)", str(conn.peer))
+        log.debug("XXXXXXX>>>> get_connection(self, a_node)=  %s", str(conn.peer))
         if conn.peer not in [cn.peer for cn in self.conn]:
-            print("XXXXXXX>>>> append_connection(self, a_node)", str(conn.peer))
+            log.debug("XXXXXXX>>>> append_connection(self, a_node)=  %s", str(conn.peer))
             self.conn.append(self.peer.connect(str(conn.peer)))
         conn.on('data', self.remote_action)
         conn.send("10 20 30")
 
     def leave_connection(self, _=0):
         [conn.close() for conn in self.conn]
-        print("XXXXXXX>>>> leave_connection conn.close()", self.conn)
+        log.debug("XXXXXXX>>>> leave_connection conn.close()=  %s", str(self.conn))
 
 
 def main(last, nodeid, remote_action):

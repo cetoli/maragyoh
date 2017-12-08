@@ -29,6 +29,7 @@ try:
 except ImportError:
     from maragyoh.views.browser import document, html, window, NODOM
     from maragyoh.views.connector import Connect
+from . import log
 
 
 from random import randint
@@ -144,7 +145,7 @@ class Item:
 
     def add_item(self, ev=None):
         ev.stopPropagation()
-        print("XXXXXXX>>>> _add_item(data)", ">%s<" % [list(self.node_id), list(self.rgb), list(self.size)])
+        log.debug("XXXXXXX>>>> Item.add_item(ev) = >%s<", [list(self.node_id), list(self.rgb), list(self.size)])
         self.create().send()
         # Item(self, self.compute_grid())
 
@@ -169,10 +170,10 @@ class Base(Item):
         self.base = canvas = document["pydiv"]
 
         def _add_item(data):
-            # print("XXXXXXX>>>> _add_item(data)", ">%s<" % data)
+            log.debug("XXXXXXX>>>> Base._add_item(data) = >%s<", data)
             _node_id, _rgb, _size = tuple(data[0]), tuple(data[1]), tuple(data[2])
-            # print("XXXXXXX>>>> Item.item", ">%s<" % Item.item.keys())
-            # print("XXXXXXX>>>> Item.item[key]", ">%s<" % type(_node_id), _node_id, _node_id[:-1])
+            log.debug("XXXXXXX>>>> Base.Item.item = >%s<", Item.item.keys())
+            log.debug("XXXXXXX>>>> type(_node_id) = >%s<, _node_id = >%s<", type(_node_id), _node_id)
             Item.item[_node_id[:-1]].create(_rgb, _node_id, _size)
 
         class NoItem:

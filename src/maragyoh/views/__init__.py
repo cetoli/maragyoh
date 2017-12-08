@@ -22,3 +22,24 @@
 .. moduleauthor:: Carlo Oliveira <carlo@nce.ufrj.br>
 
 """
+
+
+class Log:
+    @staticmethod
+    def debug(format_string, *values):
+        print(format_string % values)
+
+
+try:
+    from browser import window
+
+    log = Log()
+except ImportError:
+    from maragyoh.views.browser import document, html, window, NODOM
+    import logging as logg
+    import os
+
+    LOG_LEVEL = logg.DEBUG  # int(os.getenv("LABASELOG", logg.ERROR))
+
+    logg.basicConfig(level=LOG_LEVEL)
+    log = logg
