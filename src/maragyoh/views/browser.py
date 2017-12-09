@@ -51,7 +51,10 @@ class Browser:
 
         Browser.document = self
         Browser.html = self
+        Browser.height = 0
         Browser.window = self
+        Browser.bind = self.nodoings
+        Browser.getBoundingClientRect = self.nodoings
         Browser.Peer = self
         Browser.style = self
 

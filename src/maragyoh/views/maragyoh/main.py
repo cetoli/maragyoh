@@ -35,9 +35,12 @@ from .connector import Connect
 
 from random import randint
 
+TEXT_MARGIN = 16
+
 SIZE = (50, 50)
 GRAY = (50, 50, 50)
-
+PAD = 2
+MAR = 6
 
 """*##########################################*.
 
@@ -78,19 +81,25 @@ class Item:
         # print("XXXXXXX>>>> _init", ">%s<" % [node_id, rgb, size])
         height, width = size
         brgb = tuple([max(0, k-randint(30, 100)) for k in rgb])
+        span = 100*(width-TEXT_MARGIN)/width
         self.base = base = html.DIV(style={
-            "background-color": "rgb(%d, %d, %d)" % rgb, "border": "4px solid rgb(%d, %d, %d)" % brgb, "padding": "4px",
-            "margin": "4px", "border-width": "medium", "border-radius": "15px",
+            "background-color": "rgb(%d, %d, %d)" % rgb, "border": "2px solid rgb(%d, %d, %d)" % brgb, "padding": "2px",
+            "margin": "2px", "border-radius": "8px", "overflow": "hidden",
             "height": "%dpx" % height, "width": "%dpx" % width, "float": "left"})
-        self.content = content = html.SPAN(text, style={"position": "relative", "float": "left", "width": "75%"})
-        adder = html.SPAN("➕", style={"position": "relative", "float": "left", "left": "-4px", "top": "-4px"})
+        self.content = content = html.DIV(
+            text, style={"position": "relative", "float": "left", "left": "-4px", "width": "%d%%" % span})
+        adder = html.SPAN(
+            "◉", style={"position": "relative", "float": "left", "left": "-5px", "top": "-8px", "cursor": "crosshair"})
         fixer = html.SPAN("❌", style={"position": "relative", "float": "right", "top": "-4px"})
         self.base <= adder
         self.base <= content
-        self.base <= fixer
+        # self.base <= fixer
         fixer.onclick = self.fix_item
         adder.onclick = self.add_item
         content.onclick = self.edit_item
+        content.onresize = self.compute_grid
+        content.addEventListener("change", self.compute_grid)
+        content.bind("DOMSubtreeModified",self.compute_grid)
         # parent = Item.item[tuple(node_id[:-1])]
         parent <= self
         return parent, node_id, rgb, size, text
@@ -104,34 +113,52 @@ class Item:
         :return: An instance of Item
         """
         nodeid = node_id if node_id else self.node_id + (len(self.container),)
-        rgb = rgb or (randint(240, 255), randint(240, 255), randint(240, 255))
+        rgb = rgb or (randint(235, 255), randint(235, 255), randint(235, 255))
         size = size if size else self.compute_grid()
         item = Item(node_id=nodeid, rgb=rgb, size=size, parent=self)
         Item.item[nodeid] = item
+        # self.container.append(item)
         size = self.compute_grid()
         [it.resize(size) for it in self.container]
         return item
 
-    def compute_grid(self):
+    def compute_grid(self, *_):
+        def compute_size():
+            return (height - 1 * PAD + - 2 * MAR * self.rows) / self.rows, \
+                                 (width - 1 * PAD - 2 * MAR * self.cols) / self.cols
         height, width = self.size
+        txth = self.content.getBoundingClientRect().height
+        txth = txth if isinstance(txth, int) else int(txth[:-2])
+        print("compute_grid", height, txth, type(height), type(txth))
+        height -= txth
+        cheight, cwidth = size = compute_size()
         while len(self.container) > self.capacity:
-            if height / (self.rows + 1) >= width / (self.cols + 1):
+            # if height / (self.rows + 1) >= width / (self.cols + 1):
+            if(width / (self.rows + 1) >= height / (self.cols + 1)) and (cheight > 48):
                 self.rows = self.rows + 1
             else:
                 self.cols = self.cols + 1
+                self.rows = max(1, self.rows // self.cols)
             self.capacity = self.rows * self.cols
-        # size = height / self.rows-10, width / self.cols-10
-        size = (height-1*(self.rows+1))/self.rows, (width-1*(self.cols+1))/self.cols
+            # size = height / self.rows-10, width / self.cols-10
+            cheight, cwidth = size = compute_size()
+        [item.resize(size) for item in self.container]
         # self.resize(size)
         return size
 
     def resize(self, size):
         height, width = self.size = size
-        height, width = height-8*(self.rows+1), width-8*(self.cols+1)
+        text_height = self.content.getBoundingClientRect().height
+        text_height = text_height if isinstance(text_height, int) else int(text_height[:-2])
+        # height -= text_height
+        # height, width = height-4*(self.rows)+2 + text_height, width-4*(self.cols)+2
         self.base.style.width = "%dpx" % width
-        self.base.style.height = "%dpx" % height
-        self.size = height, width
-        [item.resize((height/self.rows, width/self.cols)) for item in self.container]
+        self.content.style.width = "%d%%" % (100*(width-TEXT_MARGIN)/width)
+        self.base.style.height = "%d%s" % (height, "px")
+        # self.size = height, width
+        self.compute_grid()
+        # size = (height-4*self.rows+2)/self.rows, (width-4*self.cols+2)/self.cols
+        # [item.resize(size) for item in self.container]
 
     def __le__(self, square):
         self.container.append(square)
@@ -194,10 +221,13 @@ class Base(Item):
         size = height,  width
         Item.item[()], Item.item[(0,)] = self.no_item, self
         Item.__init__(self, (0,), rgb, size, self.no_item)
-        Item.conn = Connect(last, node_id, _add_item)
+        Item.conn = self   # Connect(last, node_id, _add_item)
         self.base.style.left = 40
         self.base.style.top = 10
         self.base.style.position = "absolute"
+
+    def send(self):
+        pass
 
 
 """*##########################################*.
