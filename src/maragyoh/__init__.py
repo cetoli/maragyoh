@@ -26,7 +26,7 @@ import os
 import sys
 import logging as log
 from bottle import TEMPLATE_PATH
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 LOG_LEVEL = int(os.getenv("LABASELOG", log.ERROR))
 
 log.basicConfig(level=LOG_LEVEL)

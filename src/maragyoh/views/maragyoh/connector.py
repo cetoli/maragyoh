@@ -26,13 +26,13 @@
 =========
 Connector
 =========
-
-"""
 try:
     from browser import window
 except ImportError:
     from maragyoh.views.browser import document, html, window, NODOM
-from . import log
+
+"""
+from . import log, window
 
 
 class Connect:

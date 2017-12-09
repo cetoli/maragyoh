@@ -38,7 +38,7 @@ if "Brython" in sys.version:
 
     print(connector)
     NODOM = html.DIV()
-    assert window and html and window and document and NODOM and connector and maragyoh
+    assert window and html and window and document and NODOM and connector and main
 
 else:
     from maragyoh.views.browser import document, html, window, NODOM

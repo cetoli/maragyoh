@@ -30,12 +30,18 @@ class Log:
         print(format_string % values)
 
 
+'''
 try:
-    from browser import window
+    import browser
+    from browser import window, html, window
+    from . import connector
+
+    NODOM = html.DIV()
 
     log = Log()
 except ImportError:
     from maragyoh.views.browser import document, html, window, NODOM
+    from maragyoh.views import connector
     import logging as logg
     import os
 
@@ -43,3 +49,18 @@ except ImportError:
 
     logg.basicConfig(level=LOG_LEVEL)
     log = logg
+'''
+import sys
+if "Brython" in sys.version:
+    from browser import window, html, window
+    NODOM = html.DIV()
+
+else:
+    from maragyoh.views.browser import document, html, window, NODOM
+    import logging as log
+    import os
+
+    LOG_LEVEL = log.DEBUG  # int(os.getenv("LABASELOG", logg.ERROR))
+
+    log.basicConfig(level=LOG_LEVEL)
+    #log = logg

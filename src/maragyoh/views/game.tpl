@@ -36,7 +36,7 @@
         <script type="text/javascript" src="https://cdn.rawgit.com/brython-dev/brython/3.3.4/www/src/brython.js"></script>
 
         <script type="text/python">
-            from rtcgame import main
+            from maragyoh.main import main
             main({{lastid}},"{{ nodekey }}")
         </script>
     </head>

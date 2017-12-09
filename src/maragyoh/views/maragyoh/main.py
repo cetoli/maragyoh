@@ -21,7 +21,6 @@
 
 .. moduleauthor:: Carlo Oliveira <carlo@nce.ufrj.br>
 
-"""
 try:
     from browser import document, html, window
     from connector import Connect
@@ -29,7 +28,9 @@ try:
 except ImportError:
     from maragyoh.views.browser import document, html, window, NODOM
     from maragyoh.views.connector import Connect
-from . import log
+"""
+from . import log, document, html, window, NODOM
+from .connector import Connect
 
 
 from random import randint
@@ -76,10 +77,12 @@ class Item:
         """
         # print("XXXXXXX>>>> _init", ">%s<" % [node_id, rgb, size])
         height, width = size
+        brgb = tuple([max(0, k-randint(30, 100)) for k in rgb])
         self.base = base = html.DIV(style={
-            "background-color": "rgb(%d, %d, %d)" % rgb, "padding": "4px", "margin": "4px",
+            "background-color": "rgb(%d, %d, %d)" % rgb, "border": "4px solid rgb(%d, %d, %d)" % brgb, "padding": "4px",
+            "margin": "4px", "border-width": "medium", "border-radius": "15px",
             "height": "%dpx" % height, "width": "%dpx" % width, "float": "left"})
-        self.content = content = html.SPAN(text)
+        self.content = content = html.SPAN(text, style={"position": "relative", "float": "left", "width": "75%"})
         adder = html.SPAN("➕", style={"position": "relative", "float": "left", "left": "-4px", "top": "-4px"})
         fixer = html.SPAN("❌", style={"position": "relative", "float": "right", "top": "-4px"})
         self.base <= adder
@@ -101,7 +104,7 @@ class Item:
         :return: An instance of Item
         """
         nodeid = node_id if node_id else self.node_id + (len(self.container),)
-        rgb = rgb or (randint(50, 250), randint(50, 250), randint(50, 250))
+        rgb = rgb or (randint(240, 255), randint(240, 255), randint(240, 255))
         size = size if size else self.compute_grid()
         item = Item(node_id=nodeid, rgb=rgb, size=size, parent=self)
         Item.item[nodeid] = item
@@ -134,11 +137,13 @@ class Item:
         self.container.append(square)
         self.base <= square.base
 
-    def fix_item(self, ev=None):
+    @staticmethod
+    def fix_item(ev=None):
         ev.stopPropagation()
         ev.target.contentEditable = False
 
-    def edit_item(self, ev=None):
+    @staticmethod
+    def edit_item(ev=None):
         ev.stopPropagation()
         ev.target.contentEditable = True
         # self.create().send()
