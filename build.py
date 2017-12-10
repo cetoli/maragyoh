@@ -4,8 +4,9 @@ import os
 import sys
 
 SRC = os.path.join(os.path.dirname(__file__), "src")
-DOC = os.path.join(os.path.dirname(__file__), "docs")
+DOC = os.path.join(os.path.dirname(__file__), "doc")
 sys.path.append(SRC)
+sys.path.append(DOC)
 from maragyoh import __version__
 
 use_plugin("python.core")
@@ -66,3 +67,31 @@ def buid_docs(project, logger):
     result = check_output(['make', '-C', DOC, 'html'])
     logger.info(result)
 
+
+@task
+def build_web(project, logger):
+    from subprocess import check_output
+    from distutils.dir_util import copy_tree, mkpath
+    from shutil import rmtree, copy
+    from os import chdir
+    rmtree("src/maragyoh/views/build")
+    r = mkpath("src/maragyoh/views/build")
+    chdir("src/maragyoh/views/build")
+    logger.info(r)
+    result0 = check_output(['python3', '-m', "brython", '--install'])
+    logger.info(result0)
+    r = mkpath("maragyoh")
+    logger.info(r)
+    copy_tree("../maragyoh", "maragyoh")
+    r = copy("../.bundle-include", ".")
+    logger.info(r)
+    r = copy("../maragyoh.html", ".")
+    result = check_output(['python3', '-m', "brython", '--modules'])
+    logger.info(r)
+    logger.info(result)
+
+
+if __name__ == "__main__":
+    from subprocess import check_output
+    result0 = check_output(['pyb', 'build_web'])
+    [print(line) for line in str(result0).split("\\n")]

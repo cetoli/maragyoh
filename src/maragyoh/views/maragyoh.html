@@ -34,14 +34,14 @@
         <meta http-equiv="content-type" content="application/xml;charset=utf-8" />
         <script type="text/javascript" src="peer.js"></script>
         <script type="text/javascript" src="brython.js"></script>
-        <script type="text/javascript" src="brython_stdlib.js"></script>
+        <script type="text/javascript" src="brython_modules.js"></script>
 
         <script type="text/python">
-            from rtcgame import main
-            main({{lastid}},"{{ nodekey }}")
+            from maragyoh.main import main
+            main(222,"NODEKEY%d")
         </script>
     </head>
-    <body onLoad="brython({debug:1, cache:'browser', static_stdlib_import:true})" background="https://i.imgur.com/IIY8Oj7.jpg">
+    <body onLoad="brython({debug:1, cache:'browser', static_stdlib_import:true})" background="Ivory">
            <div id="pydiv"  title="" style="width: 98%;
                 height: 98%;
                 position: absolute;

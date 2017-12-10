@@ -34,20 +34,17 @@ class Log:
 if "Brython" in sys.version:
     from browser import window, html, window, document
     log = Log()
-    from maragyoh import connector, main
-
-    print(connector)
+    from . import connector
     NODOM = html.DIV()
-    assert window and html and window and document and NODOM and connector and maragyoh
+    assert window and html and window and document and NODOM and connector  # and maragyoh
 
 else:
     from maragyoh.views.browser import document, html, window, NODOM
     import logging as log
     from maragyoh.views.maragyoh import connector, main
-    from maragyoh.views.maragyoh.main import Base, Item
-    assert window and html and window and document and NODOM and connector and main and Base and Item
-    # import os
+    import os
 
     LOG_LEVEL = log.DEBUG  # int(os.getenv("LABASELOG", logg.ERROR))
 
     log.basicConfig(level=LOG_LEVEL)
+    assert window and html and window and document and NODOM and connector and main

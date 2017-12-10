@@ -1,5 +1,5 @@
 import unittest
-from maragyoh.views.rtcgame import Base, Item
+from . import Base, Item, log
 
 
 class TestCaseRtc(unittest.TestCase):
@@ -8,7 +8,7 @@ class TestCaseRtc(unittest.TestCase):
     """
     def setUp(self):
         Item.item = {}
-        self.baser = Base(0, "NOD%02d")
+        self.baser = Base(0, "NOD%02d", )
         Item.conn.send = lambda data=0: self._send(data)
 
     def _send(self, data):
@@ -82,10 +82,10 @@ class TestCaseRtc(unittest.TestCase):
         """Creating a remote item instance."""
 
         def _add_item(data):
-            print("XXXXXXX>>>> _add_item(data)", ">%s<" % data)
+            log.debug("XXXXXXX>>>> _add_item(data) >%s<", data)
             _rgb, _node_id, _size = tuple(data[0]), tuple(data[1]), tuple(data[2])
-            print("XXXXXXX>>>> Item.item", ">%s<" % Item.item.keys())
-            return Item.item[tuple(data[1][:-1])].create(_rgb, _node_id, _size)
+            log.debug("XXXXXXX>>>> Item.item >%s<", Item.item.keys())
+            return Item.item[tuple(data[1][:-1])].create(_rgb, node_id=_node_id, size=_size)
         itemer = self.baser
         first = itemer.create((6, 5, 4))
         second = itemer.create((9, 8, 7))

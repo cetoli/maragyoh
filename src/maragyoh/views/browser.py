@@ -35,6 +35,8 @@ class Browser:
     innerHeight = 444
     innerWidth = 888
     DIV = None
+    SPAN = None
+    new = None
     addEventListener = None
     Peer = None
     style = None
@@ -49,7 +51,10 @@ class Browser:
 
         Browser.document = self
         Browser.html = self
+        Browser.height = 0
         Browser.window = self
+        Browser.bind = self.nodoings
+        Browser.getBoundingClientRect = self.nodoings
         Browser.Peer = self
         Browser.style = self
 
@@ -77,10 +82,14 @@ class Browser:
         """
         return self
 
-browser = Browser
 
-document = browser.document = Browser()
-html = browser.html = Browser()
-window = browser.window = Browser()
-DIV = browser.DIV = browser.window.addEventListener = window.addEventListener = window.Peer.new = window.Peer.on = Browser().nodoings
+browser = Browser
+_ALL = (browser.document, browser.html, browser.window, browser.DIV)
+_ = Browser()
+document = browser.document  # = Browser()
+html = browser.html  # = Browser()
+window = browser.window  # = Browser()
+DIV = browser.DIV = browser.new = browser.on = browser.SPAN = browser.window.addEventListener = Browser().nodoings
+window.addEventListener = window.Peer.new = window.Peer.on = Browser().nodoings
 NODOM = Browser()
+ALL = (browser.document, browser.html, browser.window, browser.DIV)
