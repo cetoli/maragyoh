@@ -73,8 +73,9 @@ def build_web(project, logger):
     from subprocess import check_output
     from distutils.dir_util import copy_tree, mkpath
     from shutil import rmtree, copy
-    from os import chdir
-    rmtree("src/maragyoh/views/build")
+    from os import chdir, path
+    if path.isdir("src/maragyoh/views/build"):
+        rmtree("src/maragyoh/views/build")
     r = mkpath("src/maragyoh/views/build")
     chdir("src/maragyoh/views/build")
     logger.info(r)
