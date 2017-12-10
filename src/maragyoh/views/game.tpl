@@ -40,9 +40,9 @@
             main({{lastid}},"{{ nodekey }}")
         </script>
     </head>
-    <body onLoad="brython({debug:1, cache:'browser', static_stdlib_import:true})" background="https://i.imgur.com/IIY8Oj7.jpg">
-           <div id="pydiv"  title="" style="width: 98%;
-                height: 98%;
+    <body onLoad="brython({debug:1, cache:'browser', static_stdlib_import:true})" background="Ivory">
+           <div id="pydiv"  title="" style="width: 99%;
+                height: 99%;
                 position: absolute;
                 top:0;
                 bottom: 0;

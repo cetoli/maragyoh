@@ -38,7 +38,7 @@ from random import randint
 TEXT_MARGIN = 16
 
 SIZE = (50, 50)
-GRAY = (50, 50, 50)
+GRAY = (250, 250, 250)
 PAD = 2
 MAR = 6
 
@@ -82,7 +82,7 @@ class Item:
         height, width = size
         brgb = tuple([max(0, k-randint(30, 100)) for k in rgb])
         span = 100*(width-TEXT_MARGIN)/width
-        self.base = base = html.DIV(style={
+        self.base = html.DIV(style={
             "background-color": "rgb(%d, %d, %d)" % rgb, "border": "2px solid rgb(%d, %d, %d)" % brgb, "padding": "2px",
             "margin": "2px", "border-radius": "8px", "overflow": "hidden",
             "height": "%dpx" % height, "width": "%dpx" % width, "float": "left"})
@@ -100,7 +100,6 @@ class Item:
         content.onresize = self.compute_grid
         content.addEventListener("change", self.compute_grid)
         content.bind("DOMSubtreeModified",self.compute_grid)
-        # parent = Item.item[tuple(node_id[:-1])]
         parent <= self
         return parent, node_id, rgb, size, text
 
@@ -117,7 +116,6 @@ class Item:
         size = size if size else self.compute_grid()
         item = Item(node_id=nodeid, rgb=rgb, size=size, parent=self)
         Item.item[nodeid] = item
-        # self.container.append(item)
         size = self.compute_grid()
         [it.resize(size) for it in self.container]
         return item
@@ -129,12 +127,12 @@ class Item:
         height, width = self.size
         txth = self.content.getBoundingClientRect().height
         txth = txth if isinstance(txth, int) else int(txth[:-2])
-        print("compute_grid", height, txth, type(height), type(txth))
+        # print("compute_grid", height, txth, type(height), type(txth))
         height -= txth
         cheight, cwidth = size = compute_size()
+        self.capacity = self.cols = self.rows = 1
         while len(self.container) > self.capacity:
-            # if height / (self.rows + 1) >= width / (self.cols + 1):
-            if(width / (self.rows + 1) >= height / (self.cols + 1)) and (cheight > 48):
+            if(3*width / (self.rows + 1) >= height / (self.cols + 1)) and (cheight > 48):
                 self.rows = self.rows + 1
             else:
                 self.cols = self.cols + 1
@@ -143,15 +141,10 @@ class Item:
             # size = height / self.rows-10, width / self.cols-10
             cheight, cwidth = size = compute_size()
         [item.resize(size) for item in self.container]
-        # self.resize(size)
         return size
 
     def resize(self, size):
         height, width = self.size = size
-        text_height = self.content.getBoundingClientRect().height
-        text_height = text_height if isinstance(text_height, int) else int(text_height[:-2])
-        # height -= text_height
-        # height, width = height-4*(self.rows)+2 + text_height, width-4*(self.cols)+2
         self.base.style.width = "%dpx" % width
         self.content.style.width = "%d%%" % (100*(width-TEXT_MARGIN)/width)
         self.base.style.height = "%d%s" % (height, "px")
@@ -200,6 +193,10 @@ class Base(Item):
     """
     def __init__(self, last, node_id, rgb=GRAY):
         self.base = canvas = document["pydiv"]
+        canvas.text = ""
+
+        def resize(_):
+            self.resize([window.innerHeight - 20, window.innerWidth - 30])
 
         def _add_item(data):
             log.debug("XXXXXXX>>>> Base._add_item(data) = >%s<", data)
@@ -217,16 +214,16 @@ class Base(Item):
 
         Item.prefix = node_id
         self.no_item = NoItem()
-        height,  width = window.innerHeight - 40, window.innerWidth - 100
-        size = height,  width
+        size = window.innerHeight - 20, window.innerWidth - 30
+        window.onresize = resize
         Item.item[()], Item.item[(0,)] = self.no_item, self
         Item.__init__(self, (0,), rgb, size, self.no_item)
         Item.conn = self   # Connect(last, node_id, _add_item)
-        self.base.style.left = 40
-        self.base.style.top = 10
+        self.base.style.left = 2
+        self.base.style.top = -2
         self.base.style.position = "absolute"
 
-    def send(self):
+    def send(self, *_):
         pass
 
 
@@ -246,5 +243,3 @@ if __name__ == "__main__":
         item=Item(12, GRAY),
         NODOM=NODOM
     ))
-
-    doctest.testmod(globs=dict(item=Item(12, GRAY), NODOM=NODOM))
