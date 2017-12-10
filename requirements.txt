@@ -4,4 +4,5 @@ pybuilder==0.10.36
 minimock==1.2.8
 chardet>=3.0.2
 sphinx>=1.4
+nose
 
